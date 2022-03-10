@@ -29,8 +29,6 @@ The next three digits `NNN` indicates the position of birth by registry based on
 
 If for example, the number is 120, it means that person was the 120th person to be registered as having been born on that particular day, for that gender.
 
-> TODO/Find out: Males start at 5 so is {5}{120} = 120, but {6}{150} would be 1000 (000 - 999) + 150 = 1150th birth/registration for that day or just 150? That would mean there is a limit of 1000 male/female registrations per day?
-
 > {950624} {5} {120} CAZ
 
 The next digit `C` indicates citizenship. `0` if the person is a South African citizen, or `1` if the person is a permanent resident.
@@ -42,7 +40,7 @@ old ID numbers were reissued to remove this.
 
 > {950624} {5} {120} {0} {0} Z
 
-The last digit `Z` is a checksum digit, used to check that the number sequence is accurate using the Luhn algorithm.
+The last digit `Z` is a checksum digit, used to check that the number sequence is accurate using the [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm.
 
 So, ID number `9506245120008` will reflect as the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`
 
