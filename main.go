@@ -10,8 +10,9 @@ import (
 type IDGender string
 
 const (
-	Male   IDGender = "male"
-	Female IDGender = "female"
+	Unknown IDGender = "unknown"
+	Male    IDGender = "male"
+	Female  IDGender = "female"
 )
 
 type Details struct {
@@ -20,15 +21,13 @@ type Details struct {
 	Citizen bool
 }
 
-var errorMessage = "invalid south african id number"
-
 // IsValid determines if the given ID number is valid using the Luhn algorithm.
-func IsValid(id string) bool {
+func IsValid(id string) error {
 	var sum int
 	var alternate bool
 	length := len(id)
 	if length != 13 {
-		return false
+		return errors.New("the provided south african id number does not equal 13 characters")
 	}
 	for i := length - 1; i > -1; i-- {
 		mod, _ := strconv.Atoi(string(id[i]))
@@ -41,7 +40,11 @@ func IsValid(id string) bool {
 		alternate = !alternate
 		sum += mod
 	}
-	return sum%10 == 0
+	if sum%10 == 0 {
+		return nil
+	} else {
+		return errors.New("the provided south african id number is not valid")
+	}
 }
 
 // Gender determines if the person is male or female.
@@ -49,8 +52,8 @@ func IsValid(id string) bool {
 // Zero to four is considered female, five to nine is considered male.
 // It returns either "male" or "female" and any errors encountered.
 func Gender(id string) (IDGender, error) {
-	if !IsValid(id) {
-		return "", errors.New(errorMessage)
+	if err := IsValid(id); err != nil {
+		return Unknown, err
 	}
 	gender, _ := strconv.Atoi(id[6:7])
 	if gender < 5 {
@@ -64,8 +67,8 @@ func Gender(id string) (IDGender, error) {
 // Zero is considered a citizen, otherwise, it is considered a permanent resident.
 // It returns true if the person is a citizen and any errors encountered.
 func IsCitizen(id string) (bool, error) {
-	if !IsValid(id) {
-		return false, errors.New(errorMessage)
+	if err := IsValid(id); err != nil {
+		return false, err
 	}
 	citizenCode := id[10:11]
 	return citizenCode == "0", nil
@@ -76,10 +79,9 @@ func IsCitizen(id string) (bool, error) {
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth and any errors encountered.
 func DateOfBirth(id string) (time.Time, error) {
-	if !IsValid(id) {
-		return time.Now(), errors.New(errorMessage)
+	if err := IsValid(id); err != nil {
+		return time.Now(), err
 	}
-
 	// Get current date along with assumed century
 	CurrentYear, CurrentMonth, CurrentDay := time.Now().Date()
 	CurrentCentury := (CurrentYear / 100) * 100
@@ -111,8 +113,8 @@ func DateOfBirth(id string) (time.Time, error) {
 // Details include gender, citizenship, and date of birth.
 // It returns the details and any errors encountered.
 func Parse(id string) (Details, error) {
-	if !IsValid(id) {
-		return Details{}, errors.New(errorMessage)
+	if err := IsValid(id); err != nil {
+		return Details{}, err
 	}
 	dob, _ := DateOfBirth(id)
 	gender, _ := Gender(id)

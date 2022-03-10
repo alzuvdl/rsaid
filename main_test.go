@@ -15,13 +15,15 @@ var shortNumber = "950624"
 
 func Test_IsValid(t *testing.T) {
 
-	if rsaid.IsValid(invalidIDN) != false {
+	if err := rsaid.IsValid(invalidIDN); err == nil {
 		t.Errorf("Does not determine valid id correctly")
 	}
-	if rsaid.IsValid(validMale) != true {
+
+	if err := rsaid.IsValid(validMale); err != nil {
 		t.Errorf("Does not determine valid id correctly")
 	}
-	if rsaid.IsValid(shortNumber) != false {
+
+	if err := rsaid.IsValid(shortNumber); err == nil {
 		t.Errorf("Does not determine valid id correctly")
 	}
 }
@@ -30,11 +32,11 @@ func Test_Gender(t *testing.T) {
 
 	man, man_err := rsaid.Gender(validMale)
 	woman, wom_err := rsaid.Gender(validFemale)
-	if man != "male" || man_err != nil {
+	if man != rsaid.Male || man_err != nil {
 		t.Errorf("Does not determine gender correctly")
 	}
 
-	if woman != "female" || wom_err != nil {
+	if woman != rsaid.Female || wom_err != nil {
 		t.Errorf("Does not determine gender correctly")
 	}
 }
