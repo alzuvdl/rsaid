@@ -55,7 +55,7 @@ func Test_IsCitizen(t *testing.T) {
 
 func Test_BirthDate(t *testing.T) {
 
-	dob, err := rsaid.BirthDate(validMale)
+	dob, err := rsaid.DateOfBirth(validMale)
 
 	if dob.Year() != 1995 || err != nil {
 		t.Errorf("Does not determine date of birth correctly")
@@ -67,7 +67,7 @@ func Test_BirthDate(t *testing.T) {
 		t.Errorf("Does not determine date of birth correctly")
 	}
 
-	_, dob_err := rsaid.BirthDate(invalidDOB)
+	_, dob_err := rsaid.DateOfBirth(invalidDOB)
 	if dob_err == nil {
 		t.Errorf("Does not determine date of birth correctly")
 	}

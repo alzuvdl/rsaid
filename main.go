@@ -69,7 +69,7 @@ func IsCitizen(id string) (bool, error) {
 // This is calculated by using the first 6 digits in the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth and any errors encountered.
-func BirthDate(id string) (time.Time, error) {
+func DateOfBirth(id string) (time.Time, error) {
 	if !IsValid(id) {
 		return time.Now(), errors.New(errorMessage)
 	}
@@ -108,7 +108,7 @@ func Parse(id string) (Details, error) {
 	if !IsValid(id) {
 		return Details{}, errors.New(errorMessage)
 	}
-	dob, _ := BirthDate(id)
+	dob, _ := DateOfBirth(id)
 	gender, _ := Gender(id)
 	citizen, _ := IsCitizen(id)
 	return Details{
