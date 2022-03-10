@@ -80,9 +80,9 @@ func Test_Parse(t *testing.T) {
 	person, err := rsaid.Parse(validMale)
 
 	if err != nil {
-		t.Errorf("Does not parse id number correctly")
+		t.Errorf("Does not parse id number correctly: %s", err.Error())
 	}
-	if person.Gender != "male" {
+	if person.Gender != rsaid.Male {
 		t.Errorf("Does not parse gender correctly")
 	}
 	if person.Citizen != true {
