@@ -8,7 +8,7 @@ import (
 
 var validMale = "9506245120008"
 var validFemale = "9506244120009"
-var invalidDOB = "9502305120008"
+var invalidDOB = "9502305120004"
 var invalidIDN = "9506245120009"
 var nonCitizen = "9506245120107"
 var shortNumber = "950624"
