@@ -7,9 +7,16 @@ import (
 	"time"
 )
 
+type IDGender string
+
+const (
+	Male   IDGender = "male"
+	Female IDGender = "female"
+)
+
 type Details struct {
 	DOB     time.Time
-	Gender  string
+	Gender  IDGender
 	Citizen bool
 }
 
@@ -41,15 +48,15 @@ func IsValid(id string) bool {
 // Gender is calculated by using the 7th digit in the 13 digit ID number.
 // Zero to four is considered female, five to nine is considered male.
 // It returns either "male" or "female" and any errors encountered.
-func Gender(id string) (string, error) {
+func Gender(id string) (IDGender, error) {
 	if !IsValid(id) {
 		return "", errors.New(errorMessage)
 	}
 	gender, _ := strconv.Atoi(id[6:7])
 	if gender < 5 {
-		return "female", nil
+		return Female, nil
 	}
-	return "male", nil
+	return Male, nil
 }
 
 // IsCitizen determines if the person is a South African citizen.
