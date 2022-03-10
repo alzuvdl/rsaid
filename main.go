@@ -56,7 +56,7 @@ func Gender(id string) (string, error) {
 // Determines South African citizenship of the person from the ID number.
 // This is calculated by using the 11th digit in the 13 digit ID number.
 // An 11th digit value of zero is considered a citizen, otherwise, it is considered a permanent resident.
-// It returns true of the person is a citizen and any errors encountered.
+// It returns true if the person is a citizen and any errors encountered.
 func IsCitizen(id string) (bool, error) {
 	if !IsValid(id) {
 		return false, errors.New(errorMessage)
