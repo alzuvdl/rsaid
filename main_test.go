@@ -14,6 +14,7 @@ var nonCitizen = "9506245120107"
 var shortNumber = "950624"
 
 func Test_IsValid(t *testing.T) {
+
 	if rsaid.IsValid(invalidIDN) != false {
 		t.Errorf("Does not determine valid id correctly")
 	}
@@ -24,6 +25,7 @@ func Test_IsValid(t *testing.T) {
 		t.Errorf("Does not determine valid id correctly")
 	}
 }
+
 func Test_Gender(t *testing.T) {
 
 	man, man_err := rsaid.Gender(validMale)
@@ -36,6 +38,7 @@ func Test_Gender(t *testing.T) {
 		t.Errorf("Does not determine gender correctly")
 	}
 }
+
 func Test_IsCitizen(t *testing.T) {
 
 	cit, cit_err := rsaid.IsCitizen(validMale)
