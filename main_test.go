@@ -80,14 +80,13 @@ func Test_Gender(t *testing.T) {
 
 func Test_IsCitizen(t *testing.T) {
 
-	cit, cit_err := rsaid.IsCitizen(validMale)
-	pem, pem_err := rsaid.IsCitizen(nonCitizen)
-
-	if cit != true || cit_err != nil {
+	cit, err := rsaid.IsCitizen(validMale)
+	if cit != true || err != nil {
 		t.Errorf("Does not determine citizenship correctly")
 	}
 
-	if pem != false || pem_err != nil {
+	pem, err := rsaid.IsCitizen(nonCitizen)
+	if pem != false || err != nil {
 		t.Errorf("Does not determine citizenship correctly")
 	}
 }
