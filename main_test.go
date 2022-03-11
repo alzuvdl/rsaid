@@ -7,7 +7,7 @@ import (
 	"github.com/jacovdloo/rsaid"
 )
 
-var validMale = "9506245120008"
+var citizenMale = "9506245120008"
 var validFemale = "9506244120009"
 var invalidDOB = "9502305120004"
 var nonCitizen = "9506245120107"
@@ -67,33 +67,85 @@ func Test_IsValid(t *testing.T) {
 
 func Test_Gender(t *testing.T) {
 
-	man, err := rsaid.Gender(validMale)
-	if man != rsaid.GenderMale || err != nil {
-		t.Errorf("Does not determine gender correctly")
+	tests := []struct {
+		name   string
+		id     string
+		gender int
+	}{
+		{
+			name:   "Is Male",
+			id:     citizenMale,
+			gender: int(rsaid.GenderMale),
+		},
+		{
+			name:   "Is Female",
+			id:     validFemale,
+			gender: int(rsaid.GenderFemale),
+		},
 	}
 
-	woman, err := rsaid.Gender(validFemale)
-	if woman != rsaid.GenderFemale || err != nil {
-		t.Errorf("Does not determine gender correctly")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gender, err := rsaid.Gender(tt.id)
+			if int(gender) != tt.gender || err != nil {
+				t.Errorf("Does not determine gender correctly")
+			}
+		})
 	}
+
+	// man, err := rsaid.Gender(citizenMale)
+	// if man != rsaid.GenderMale || err != nil {
+	// 	t.Errorf("Does not determine gender correctly")
+	// }
+
+	// woman, err := rsaid.Gender(validFemale)
+	// if woman != rsaid.GenderFemale || err != nil {
+	// 	t.Errorf("Does not determine gender correctly")
+	// }
 }
 
 func Test_IsCitizen(t *testing.T) {
 
-	cit, err := rsaid.IsCitizen(validMale)
-	if cit != true || err != nil {
-		t.Errorf("Does not determine citizenship correctly")
+	tests := []struct {
+		name    string
+		id      string
+		citizen bool
+	}{
+		{
+			name:    "Citizenship",
+			id:      citizenMale,
+			citizen: true,
+		},
+		{
+			name:    "Permanent Resident",
+			id:      nonCitizen,
+			citizen: false,
+		},
 	}
 
-	pem, err := rsaid.IsCitizen(nonCitizen)
-	if pem != false || err != nil {
-		t.Errorf("Does not determine citizenship correctly")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cit, err := rsaid.IsCitizen(tt.id)
+			if cit != tt.citizen || err != nil {
+				t.Errorf("Does not determine citizenship correctly")
+			}
+		})
 	}
+
+	// cit, err := rsaid.IsCitizen(citizenMale)
+	// if cit != true || err != nil {
+	// 	t.Errorf("Does not determine citizenship correctly")
+	// }
+
+	// pem, err := rsaid.IsCitizen(nonCitizen)
+	// if pem != false || err != nil {
+	// 	t.Errorf("Does not determine citizenship correctly")
+	// }
 }
 
 func Test_DateOfBirth(t *testing.T) {
 
-	dob, err := rsaid.DateOfBirth(validMale)
+	dob, err := rsaid.DateOfBirth(citizenMale)
 
 	if dob.Year() != 1995 || err != nil {
 		t.Errorf("Does not determine date of birth correctly")
@@ -113,7 +165,7 @@ func Test_DateOfBirth(t *testing.T) {
 
 func Test_Parse(t *testing.T) {
 
-	person, err := rsaid.Parse(validMale)
+	person, err := rsaid.Parse(citizenMale)
 
 	if err != nil {
 		t.Errorf("Does not parse ID number correctly: %s", err.Error())
