@@ -69,8 +69,8 @@ func Test_BirthDate(t *testing.T) {
 		t.Errorf("Does not determine date of birth correctly")
 	}
 
-	_, dob_err := rsaid.DateOfBirth(invalidDOB)
-	if dob_err == nil {
+	_, err = rsaid.DateOfBirth(invalidDOB)
+	if err == nil {
 		t.Errorf("Does not determine date of birth correctly")
 	}
 }
