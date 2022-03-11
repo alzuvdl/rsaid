@@ -7,21 +7,22 @@ import (
 	"time"
 )
 
-type IDGender string
+type gender int
 
 const (
-	Unknown IDGender = "unknown"
-	Male    IDGender = "male"
-	Female  IDGender = "female"
+	GenderUnknown gender = iota
+	GenderMale
+	GenderFemale
 )
 
 type Details struct {
 	DOB     time.Time
-	Gender  IDGender
+	Gender  gender
 	Citizen bool
 }
 
 // IsValid determines if the given ID number is valid using the Luhn algorithm.
+// It returns an error if the ID number is not a valid South African ID nubmer.
 func IsValid(id string) error {
 	var sum int
 	var alternate bool
@@ -30,7 +31,10 @@ func IsValid(id string) error {
 		return errors.New("the provided south african id number does not equal 13 characters")
 	}
 	for i := length - 1; i > -1; i-- {
-		mod, _ := strconv.Atoi(string(id[i]))
+		mod, err := strconv.Atoi(string(id[i]))
+		if err != nil {
+			return errors.New("the provided south african id number should be numeric")
+		}
 		if alternate {
 			mod *= 2
 			if mod > 9 {
@@ -50,16 +54,17 @@ func IsValid(id string) error {
 // Gender determines if the person is male or female.
 // Gender is calculated by using the 7th digit in the 13 digit ID number.
 // Zero to four is considered female, five to nine is considered male.
-// It returns either "male" or "female" and any errors encountered.
-func Gender(id string) (IDGender, error) {
+// It returns the gender and any errors encountered.
+func Gender(id string) (gender, error) {
 	if err := IsValid(id); err != nil {
-		return Unknown, err
+		return GenderUnknown, err
 	}
+	// At this point, we can be assured that digit 7 is numeric
 	gender, _ := strconv.Atoi(id[6:7])
 	if gender < 5 {
-		return Female, nil
+		return GenderFemale, nil
 	}
-	return Male, nil
+	return GenderMale, nil
 }
 
 // IsCitizen determines if the person is a South African citizen.
@@ -87,6 +92,7 @@ func DateOfBirth(id string) (time.Time, error) {
 	CurrentCentury := (CurrentYear / 100) * 100
 
 	// Get date values based off provided ID number
+	// IsValid will have ensured we are working with numbers
 	ProvidedYear, _ := strconv.Atoi(id[0:2])
 	ProvidedYear = CurrentCentury + ProvidedYear
 	ProvidedMonth, _ := strconv.Atoi(id[2:4])
@@ -110,6 +116,7 @@ func DateOfBirth(id string) (time.Time, error) {
 	if err != nil {
 		return time.Now(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
 	}
+
 	return dob, nil
 }
 

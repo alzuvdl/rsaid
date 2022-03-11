@@ -56,9 +56,9 @@ go get github.com/jacovdloo/rsaid
 package main
 
 import (
-	"fmt"
+  "fmt"
 
-	"github.com/jacovdloo/rsaid"
+  "github.com/jacovdloo/rsaid"
 )
 
 func main() {
@@ -69,15 +69,16 @@ func main() {
     fmt.Printf("validity error: %s\n", err)
   } else {
     fmt.Printf("%s is a valid South African ID number.\n", id);
-    // 9506245120008 is a valid South African ID number.
   }
 
   person, err := rsaid.Parse(id)
   if err != nil {
     fmt.Printf("parse error: %s\n", err)
   } else {
-    fmt.Println("Gender:", person.Gender) // Gender: male
+    fmt.Println("Male:", person.Gender == rsaid.GenderMale) // Male: true
+    fmt.Println("Female:", person.Gender == rsaid.GenderFemale) // Female: false
     fmt.Println("Citizen:", person.Citizen) // Citizen: true
+    fmt.Println("Resident:", !person.Citizen) // Resident: false
     fmt.Println("DOB:", person.DOB) // DOB: 1995-06-24 00:00:00 +0200 SAST
   }
 
@@ -96,7 +97,7 @@ func main() {
     fmt.Printf("date of birth error: %s\n", err)
   }
 
-  fmt.Printf("Gender: %s, Citizen: %t, DOB: %s\n", gender, citizen, dob)
-  // Gender: male, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
+  fmt.Printf("Gender: %d, Citizen: %t, DOB: %s\n", gender, citizen, dob)
+  // Gender: 1, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
 }
 ```
