@@ -7,10 +7,10 @@ import (
 	"github.com/jacovdloo/rsaid"
 )
 
-var citizenMale = "9506245120008"
-var validFemale = "9506244120009"
-var invalidDOB = "9502305120004"
 var nonCitizen = "9506245120107"
+var maleCitizen = "9506245120008"
+var femaleCitizen = "9506244120009"
+var invalidDateOfBirth = "9502305120004"
 
 func Test_IsValid(t *testing.T) {
 
@@ -68,96 +68,89 @@ func Test_IsValid(t *testing.T) {
 func Test_Gender(t *testing.T) {
 
 	tests := []struct {
-		name   string
-		id     string
-		gender int
+		name string
+		id   string
+		want int
 	}{
 		{
-			name:   "Is Male",
-			id:     citizenMale,
-			gender: int(rsaid.GenderMale),
+			name: "Is Male",
+			id:   maleCitizen,
+			want: int(rsaid.GenderMale),
 		},
 		{
-			name:   "Is Female",
-			id:     validFemale,
-			gender: int(rsaid.GenderFemale),
+			name: "Is Female",
+			id:   femaleCitizen,
+			want: int(rsaid.GenderFemale),
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gender, err := rsaid.Gender(tt.id)
-			if int(gender) != tt.gender || err != nil {
-				t.Errorf("Does not determine gender correctly")
+			if int(gender) != tt.want || err != nil {
+				if err != nil {
+					t.Errorf("Does not determine gender correctly: %v", err)
+				} else {
+					t.Errorf("Does not determine gender correctly")
+				}
 			}
 		})
 	}
-
-	// man, err := rsaid.Gender(citizenMale)
-	// if man != rsaid.GenderMale || err != nil {
-	// 	t.Errorf("Does not determine gender correctly")
-	// }
-
-	// woman, err := rsaid.Gender(validFemale)
-	// if woman != rsaid.GenderFemale || err != nil {
-	// 	t.Errorf("Does not determine gender correctly")
-	// }
 }
 
 func Test_IsCitizen(t *testing.T) {
 
 	tests := []struct {
-		name    string
-		id      string
-		citizen bool
+		name string
+		id   string
+		want bool
 	}{
 		{
-			name:    "Citizenship",
-			id:      citizenMale,
-			citizen: true,
+			name: "Citizenship",
+			id:   maleCitizen,
+			want: true,
 		},
 		{
-			name:    "Permanent Resident",
-			id:      nonCitizen,
-			citizen: false,
+			name: "Permanent Resident",
+			id:   nonCitizen,
+			want: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cit, err := rsaid.IsCitizen(tt.id)
-			if cit != tt.citizen || err != nil {
-				t.Errorf("Does not determine citizenship correctly")
+			if cit != tt.want || err != nil {
+				if err != nil {
+					t.Errorf("Does not determine citizenship correctly. error = %v", err)
+				} else {
+					t.Errorf("Does not determine citizenship correctly")
+				}
 			}
 		})
 	}
-
-	// cit, err := rsaid.IsCitizen(citizenMale)
-	// if cit != true || err != nil {
-	// 	t.Errorf("Does not determine citizenship correctly")
-	// }
-
-	// pem, err := rsaid.IsCitizen(nonCitizen)
-	// if pem != false || err != nil {
-	// 	t.Errorf("Does not determine citizenship correctly")
-	// }
 }
 
 func Test_DateOfBirth(t *testing.T) {
 
-	dob, err := rsaid.DateOfBirth(citizenMale)
+	dob, err := rsaid.DateOfBirth(maleCitizen)
 
-	if dob.Year() != 1995 || err != nil {
-		t.Errorf("Does not determine date of birth correctly")
-	}
-	if dob.Month() != 6 || err != nil {
-		t.Errorf("Does not determine date of birth correctly")
-	}
-	if dob.Day() != 24 || err != nil {
-		t.Errorf("Does not determine date of birth correctly")
+	if err != nil {
+		t.Errorf("Does not determine date of birth correctly. error = %v", err)
+		return
 	}
 
-	_, err = rsaid.DateOfBirth(invalidDOB)
+	if dob.Year() != 1995 {
+		t.Errorf("Does not determine date of birth year correctly")
+	}
+	if dob.Month() != 6 {
+		t.Errorf("Does not determine date of birth month correctly")
+	}
+	if dob.Day() != 24 {
+		t.Errorf("Does not determine date of birth day correctly")
+	}
+
+	_, err = rsaid.DateOfBirth(invalidDateOfBirth)
 	if err == nil {
 		t.Errorf("Does not determine date of birth correctly")
 	}
@@ -165,7 +158,7 @@ func Test_DateOfBirth(t *testing.T) {
 
 func Test_Parse(t *testing.T) {
 
-	person, err := rsaid.Parse(citizenMale)
+	person, err := rsaid.Parse(maleCitizen)
 
 	if err != nil {
 		t.Errorf("Does not parse ID number correctly: %s", err.Error())

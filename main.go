@@ -104,15 +104,8 @@ func DateOfBirth(id string) (time.Time, error) {
 	if ProvidedYear > EligibleYear || (ProvidedYear == EligibleYear && (ProvidedMonth > int(CurrentMonth) || ProvidedMonth == int(CurrentMonth) && ProvidedDay > CurrentDay)) {
 		ProvidedYear -= 100
 	}
-	// See https://pkg.go.dev/time for standard templates
-	// Use South African Standard Time (UTC+2).
-	// Registration of ID would have happened in South Africa, regardless of citizenship or permanent resident.
-	loc, err := time.LoadLocation("Africa/Johannesburg")
-	if err != nil {
-		return time.Now(), fmt.Errorf("cannot load time zone location: %s", err.Error())
-	}
 
-	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", ProvidedYear, time.Month(ProvidedMonth), ProvidedDay), loc)
+	dob, err := time.Parse("2006-01-02", fmt.Sprintf("%d-%02d-%02d", ProvidedYear, time.Month(ProvidedMonth), ProvidedDay))
 	if err != nil {
 		return time.Now(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
 	}
@@ -125,11 +118,6 @@ func DateOfBirth(id string) (time.Time, error) {
 // It returns the details and any errors encountered.
 func Parse(id string) (Details, error) {
 
-	dob, err := DateOfBirth(id)
-	if err != nil {
-		return Details{}, err
-	}
-
 	gender, err := Gender(id)
 	if err != nil {
 		return Details{}, err
@@ -140,9 +128,14 @@ func Parse(id string) (Details, error) {
 		return Details{}, err
 	}
 
+	dob, err := DateOfBirth(id)
+	if err != nil {
+		return Details{}, err
+	}
+
 	return Details{
-		DOB:     dob,
 		Gender:  gender,
 		Citizen: citizen,
+		DOB:     dob,
 	}, nil
 }
