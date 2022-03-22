@@ -37,12 +37,12 @@ func Test_IsValid(t *testing.T) {
 		{
 			name:    "Invalid Character",
 			id:      "950624G120008",
-			wantErr: errors.New("the provided south african id number should be numeric"),
+			wantErr: errors.New("the provided south african id number is not numeric"),
 		},
 		{
 			name:    "Random Letters",
 			id:      "randomletters",
-			wantErr: errors.New("the provided south african id number should be numeric"),
+			wantErr: errors.New("the provided south african id number is not numeric"),
 		},
 		{
 			name:    "Invalid ID",

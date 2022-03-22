@@ -33,7 +33,7 @@ func IsValid(id string) error {
 	for i := length - 1; i > -1; i-- {
 		mod, err := strconv.Atoi(string(id[i]))
 		if err != nil {
-			return errors.New("the provided south african id number should be numeric")
+			return errors.New("the provided south african id number is not numeric")
 		}
 		if alternate {
 			mod *= 2
