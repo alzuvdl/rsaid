@@ -89,7 +89,7 @@ func Test_Gender(t *testing.T) {
 			gender, err := rsaid.Gender(tt.id)
 			if int(gender) != tt.want || err != nil {
 				if err != nil {
-					t.Errorf("Does not determine gender correctly: %v", err)
+					t.Errorf("Does not determine gender correctly. error = %v", err)
 				} else {
 					t.Errorf("Does not determine gender correctly")
 				}
