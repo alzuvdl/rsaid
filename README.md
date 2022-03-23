@@ -80,7 +80,7 @@ func main() {
 		fmt.Println("Female:", person.Gender == rsaid.GenderFemale) // Female: false
 		fmt.Println("Citizen:", person.Citizen)                     // Citizen: true
 		fmt.Println("Resident:", !person.Citizen)                   // Resident: false
-		fmt.Println("DOB:", person.DOB)                             // DOB: 1995-06-24 00:00:00 +0000 UTC
+		fmt.Println("DOB:", person.DOB)                             // DOB: 1995-06-24 00:00:00 +0200 SAST
 	}
 
 	gender, err := rsaid.Gender(id)
@@ -99,6 +99,6 @@ func main() {
 	}
 
 	fmt.Printf("Gender: %d, Citizen: %t, DOB: %s\n", gender, citizen, dob)
-	// Gender: 1, Citizen: true, DOB: 1995-06-24 00:00:00 +0000 UTC
+	// Gender: 1, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
 }
 ```
