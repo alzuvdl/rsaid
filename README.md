@@ -1,5 +1,7 @@
 # 🇿🇦 South African ID Validator for Go
 
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/jacovdloo/rsaid)
+
 > Inspired by https://www.npmjs.com/package/south-african-id-validator
 
 Validate ID numbers for the Republic of South Africa - taking eligibility age (16 years) into account.
