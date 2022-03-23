@@ -150,8 +150,7 @@ func Test_DateOfBirth(t *testing.T) {
 		t.Errorf("Does not determine date of birth day correctly")
 	}
 
-	_, err = rsaid.DateOfBirth(invalidDateOfBirth)
-	if err == nil {
+	if _, err = rsaid.DateOfBirth(invalidDateOfBirth); err == nil {
 		t.Errorf("Does not determine date of birth correctly")
 	}
 }
