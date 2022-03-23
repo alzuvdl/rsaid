@@ -105,7 +105,12 @@ func DateOfBirth(id string) (time.Time, error) {
 		ProvidedYear -= 100
 	}
 
-	dob, err := time.Parse("2006-01-02", fmt.Sprintf("%d-%02d-%02d", ProvidedYear, time.Month(ProvidedMonth), ProvidedDay))
+	loc, err := time.LoadLocation("Africa/Johannesburg")
+	if err != nil {
+		return time.Now(), errors.New("could not load timezone to parse date of birth")
+	}
+	// Not using time.Date since it will still parse invalid dates. For example, 95/02/30 would parse to 95/03/02.
+	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", ProvidedYear, time.Month(ProvidedMonth), ProvidedDay), loc)
 	if err != nil {
 		return time.Now(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
 	}
