@@ -7,11 +7,6 @@ import (
 	"github.com/jacovdloo/rsaid"
 )
 
-var nonCitizen = "9506245120107"
-var maleCitizen = "9506245120008"
-var femaleCitizen = "9506244120009"
-var invalidDateOfBirth = "9502305120004"
-
 func Test_IsValid(t *testing.T) {
 
 	tests := []struct {
@@ -74,12 +69,12 @@ func Test_Gender(t *testing.T) {
 	}{
 		{
 			name: "Is Male",
-			id:   maleCitizen,
+			id:   "9506245120008",
 			want: int(rsaid.GenderMale),
 		},
 		{
 			name: "Is Female",
-			id:   femaleCitizen,
+			id:   "9506244120009",
 			want: int(rsaid.GenderFemale),
 		},
 	}
@@ -107,12 +102,12 @@ func Test_IsCitizen(t *testing.T) {
 	}{
 		{
 			name: "Citizenship",
-			id:   maleCitizen,
+			id:   "9506245120008",
 			want: true,
 		},
 		{
 			name: "Permanent Resident",
-			id:   nonCitizen,
+			id:   "9506245120107",
 			want: false,
 		},
 	}
@@ -133,6 +128,8 @@ func Test_IsCitizen(t *testing.T) {
 
 func Test_DateOfBirth(t *testing.T) {
 
+	maleCitizen := "9506245120008"
+
 	dob, err := rsaid.DateOfBirth(maleCitizen)
 
 	if err != nil {
@@ -150,12 +147,15 @@ func Test_DateOfBirth(t *testing.T) {
 		t.Errorf("Does not determine date of birth day correctly")
 	}
 
-	if _, err = rsaid.DateOfBirth(invalidDateOfBirth); err == nil {
+	// Invalid DOB - 95/02/30
+	if _, err = rsaid.DateOfBirth("9502305120004"); err == nil {
 		t.Errorf("Does not determine date of birth correctly")
 	}
 }
 
 func Test_Parse(t *testing.T) {
+
+	maleCitizen := "9506245120008"
 
 	person, err := rsaid.Parse(maleCitizen)
 
