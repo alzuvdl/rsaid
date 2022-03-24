@@ -66,41 +66,18 @@ import (
 
 func main() {
 
-	id := "9506245120008"
-
-	if err := rsaid.IsValid(id); err != nil {
-		fmt.Printf("validity error: %s\n", err)
-	} else {
-		fmt.Printf("%s is a valid South African ID number.\n", id)
+	id := rsaid.IdentityNumber {
+		Number: "9506245120008",
 	}
 
-	person, err := rsaid.Parse(id)
-	if err != nil {
-		fmt.Printf("parse error: %s\n", err)
-	} else {
-		fmt.Println("Male:", person.Gender == rsaid.GenderMale)     // Male: true
-		fmt.Println("Female:", person.Gender == rsaid.GenderFemale) // Female: false
-		fmt.Println("Citizen:", person.Citizen)                     // Citizen: true
-		fmt.Println("Resident:", !person.Citizen)                   // Resident: false
-		fmt.Println("DOB:", person.DOB)                             // DOB: 1995-06-24 00:00:00 +0200 SAST
-	}
+	err := id.IsValid();
+	cit, _ := id.IsCitizen()
+	gen, _ := id.Gender()
+	dob, _ := id.DateOfBirth()
 
-	gender, err := rsaid.Gender(id)
-	if err != nil {
-		fmt.Printf("gender error: %s\n", err)
-	}
-
-	citizen, err := rsaid.IsCitizen(id)
-	if err != nil {
-		fmt.Printf("citizen error: %s\n", err)
-	}
-
-	dob, err := rsaid.DateOfBirth(id)
-	if err != nil {
-		fmt.Printf("date of birth error: %s\n", err)
-	}
-
-	fmt.Printf("Gender: %d, Citizen: %t, DOB: %s\n", gender, citizen, dob)
-	// Gender: 1, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
+	fmt.Println("Valid:", err == nil)
+	fmt.Println("Citizen:", cit)
+	fmt.Println("Male:", gen == rsaid.GenderMale)
+	fmt.Println("DOB:", dob)
 }
 ```
