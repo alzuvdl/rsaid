@@ -16,7 +16,10 @@ const (
 )
 
 type IdentityNumber struct {
-	raw  string
+	raw         string
+	DateOfBirth time.Time
+	Gender      Gender
+	IsCitizen bool
 }
 
 func Parse(idNumber string) (IdentityNumber, error) {
@@ -24,6 +27,14 @@ func Parse(idNumber string) (IdentityNumber, error) {
 	if err := idNum.validate(); err != nil {
 		return idNum, err
 	}
+
+	dob, err := idNum.dateOfBirth()
+	if err != nil {
+		return idNum, err
+	}
+	idNum.DateOfBirth = dob
+	idNum.IsCitizen = idNum.isCitizen()
+	idNum.Gender = idNum.gender()
 
 	return idNum, nil
 }
@@ -56,11 +67,11 @@ func (i IdentityNumber) validate() error {
 	}
 }
 
-func (i IdentityNumber) IsCitizen() bool {
+func (i IdentityNumber) isCitizen() bool {
 	return i.raw[10:11] == "0"
 }
 
-func (i IdentityNumber) Gender() Gender {
+func (i IdentityNumber) gender() Gender {
 	// At this point, we can be assured that digit 7 is numeric
 	gender, _ := strconv.Atoi(i.raw[6:7])
 	if gender < 5 {
@@ -71,7 +82,7 @@ func (i IdentityNumber) Gender() Gender {
 	return GenderUnknown
 }
 
-func (i IdentityNumber) DateOfBirth() (time.Time, error) {
+func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 	// Get current date along with assumed century
 	CurrentYear, CurrentMonth, CurrentDay := time.Now().Date()
 	CurrentCentury := (CurrentYear / 100) * 100
