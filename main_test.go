@@ -7,7 +7,7 @@ import (
 	"github.com/jacovdloo/rsaid"
 )
 
-func Test_IsValid(t *testing.T) {
+func Test_Parse(t *testing.T) {
 
 	tests := []struct {
 		name    string
@@ -45,6 +45,11 @@ func Test_IsValid(t *testing.T) {
 			wantErr: errors.New("the provided south african id number is not valid"),
 		},
 		{
+			name:    "Invalid DOB",
+			id:      "9502305120004",
+			wantErr: errors.New("cannot parse date of birth from id number: parsing time \"1995-02-30\": day out of range"),
+		},
+		{
 			name: "Valid ID",
 			id:   "9506245120008",
 		},
@@ -52,10 +57,9 @@ func Test_IsValid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			id := rsaid.IdentityNumber{Number: tt.id}
-			err := id.IsValid()
-			if tt.wantErr != nil && err.Error() != tt.wantErr.Error() {
-				t.Errorf("IsValid() error = %v, wantErr %v", err, tt.wantErr)
+			_, err := rsaid.Parse(tt.id)
+			if tt.wantErr != nil && tt.wantErr.Error() != err.Error() {
+				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -82,14 +86,9 @@ func Test_Gender(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			id := rsaid.IdentityNumber{Number: tt.id}
-			gender, err := id.Gender()
-			if gender != tt.want || err != nil {
-				if err != nil {
-					t.Errorf("Does not determine gender correctly. error = %v", err)
-				} else {
-					t.Errorf("Does not determine gender correctly")
-				}
+			idNum, _ := rsaid.Parse(tt.id)
+			if tt.want != idNum.Gender(){
+				t.Errorf("Does not determine gender correctly")
 			}
 		})
 	}
@@ -116,14 +115,9 @@ func Test_IsCitizen(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			id := rsaid.IdentityNumber{Number: tt.id}
-			cit, err := id.IsCitizen()
-			if cit != tt.want || err != nil {
-				if err != nil {
-					t.Errorf("Does not determine citizenship correctly. error = %v", err)
-				} else {
-					t.Errorf("Does not determine citizenship correctly")
-				}
+			idNum, _ := rsaid.Parse(tt.id)
+			if tt.want != idNum.IsCitizen() {
+				t.Errorf("Does not determine citizenship correctly")
 			}
 		})
 	}
@@ -131,30 +125,34 @@ func Test_IsCitizen(t *testing.T) {
 
 func Test_DateOfBirth(t *testing.T) {
 
-	maleCitizen := "9506245120008"
-
-	id := rsaid.IdentityNumber{Number: maleCitizen}
-
-	dob, err := id.DateOfBirth()
-
-	if err != nil {
-		t.Errorf("Does not determine date of birth correctly. error = %v", err)
-		return
+	// These tests will fail once time.Now() causes the age to not be valid.  Best to mock time.
+	tests := []struct {
+		name string
+		id   string
+		want string
+	}{
+		{
+			name: "Between 16 and 100",
+			id:   "9506245120008",
+			want: "1995-06-24 00:00:00 +0200 SAST",
+		},
+		{
+			name: "Over 100",
+			id:   "2206245120008",
+			want: "1922-06-24 00:00:00 +0200 SAST",
+		},
 	}
 
-	if dob.Year() != 1995 {
-		t.Errorf("Does not determine date of birth year correctly")
-	}
-	if dob.Month() != 6 {
-		t.Errorf("Does not determine date of birth month correctly")
-	}
-	if dob.Day() != 24 {
-		t.Errorf("Does not determine date of birth day correctly")
-	}
-
-	// Invalid DOB - 95/02/30
-	invalid := rsaid.IdentityNumber{Number: "9502305120004"}
-	if _, err = invalid.DateOfBirth(); err == nil {
-		t.Errorf("Does not determine date of birth correctly")
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			idNum, _ := rsaid.Parse(tt.id)
+			dob, err := idNum.DateOfBirth()
+			if err != nil {
+				t.Errorf("Does not determine date of birth correctly. error = %v", err)
+			}
+			if tt.want != dob.String() {
+				t.Errorf("Does not determine date of birth correctly. dob = %v", dob)
+			}
+		})
 	}
 }
