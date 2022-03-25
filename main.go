@@ -16,18 +16,27 @@ const (
 )
 
 type IdentityNumber struct {
-	Number string
+	raw  string
 }
 
-func (i IdentityNumber) IsValid() error {
+func Parse(idNumber string) (IdentityNumber, error) {
+	idNum := IdentityNumber{raw: idNumber}
+	if err := idNum.validate(); err != nil {
+		return idNum, err
+	}
+
+	return idNum, nil
+}
+
+func (i IdentityNumber) validate() error {
 	var sum int
 	var alternate bool
-	length := len(i.Number)
+	length := len(i.raw)
 	if length != 13 {
 		return errors.New("the provided south african id number does not equal 13 characters")
 	}
 	for j := length - 1; j > -1; j-- {
-		mod, err := strconv.Atoi(string(i.Number[j]))
+		mod, err := strconv.Atoi(string(i.raw[j]))
 		if err != nil {
 			return errors.New("the provided south african id number is not numeric")
 		}
@@ -47,40 +56,32 @@ func (i IdentityNumber) IsValid() error {
 	}
 }
 
-func (i IdentityNumber) IsCitizen() (bool, error) {
-	if err := i.IsValid(); err != nil {
-		return false, err
-	}
-	citizenCode := i.Number[10:11]
-	return citizenCode == "0", nil
+func (i IdentityNumber) IsCitizen() bool {
+	return i.raw[10:11] == "0"
 }
 
-func (i IdentityNumber) Gender() (Gender, error) {
-	if err := i.IsValid(); err != nil {
-		return GenderUnknown, err
-	}
+func (i IdentityNumber) Gender() Gender {
 	// At this point, we can be assured that digit 7 is numeric
-	gender, _ := strconv.Atoi(i.Number[6:7])
+	gender, _ := strconv.Atoi(i.raw[6:7])
 	if gender < 5 {
-		return GenderFemale, nil
+		return GenderFemale
+	} else if gender < 9 {
+		return GenderMale
 	}
-	return GenderMale, nil
+	return GenderUnknown
 }
 
 func (i IdentityNumber) DateOfBirth() (time.Time, error) {
-	if err := i.IsValid(); err != nil {
-		return time.Now(), err
-	}
 	// Get current date along with assumed century
 	CurrentYear, CurrentMonth, CurrentDay := time.Now().Date()
 	CurrentCentury := (CurrentYear / 100) * 100
 
 	// Get date values based off provided ID number
-	// IsValid will have ensured we are working with numbers
-	ProvidedYear, _ := strconv.Atoi(i.Number[0:2])
+	// validate will have ensured we are working with numbers
+	ProvidedYear, _ := strconv.Atoi(i.raw[0:2])
 	ProvidedYear = CurrentCentury + ProvidedYear
-	ProvidedMonth, _ := strconv.Atoi(i.Number[2:4])
-	ProvidedDay, _ := strconv.Atoi(i.Number[4:6])
+	ProvidedMonth, _ := strconv.Atoi(i.raw[2:4])
+	ProvidedDay, _ := strconv.Atoi(i.raw[4:6])
 
 	// Only 16 years and above are eligible for an ID
 	EligibleYear := CurrentYear - 16
