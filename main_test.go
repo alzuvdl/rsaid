@@ -58,7 +58,7 @@ func Test_Parse(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := rsaid.Parse(tt.id)
-			if tt.wantErr != nil && tt.wantErr.Error() != err.Error() {
+			if tt.wantErr != nil && err != nil && tt.wantErr.Error() != err.Error() {
 				t.Errorf("Parse() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -87,7 +87,7 @@ func Test_Gender(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			idNum, _ := rsaid.Parse(tt.id)
-			if tt.want != idNum.Gender{
+			if tt.want != idNum.Gender(){
 				t.Errorf("Does not determine gender correctly")
 			}
 		})
@@ -116,7 +116,7 @@ func Test_IsCitizen(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			idNum, _ := rsaid.Parse(tt.id)
-			if tt.want != idNum.IsCitizen {
+			if tt.want != idNum.IsCitizen() {
 				t.Errorf("Does not determine citizenship correctly")
 			}
 		})
@@ -146,7 +146,7 @@ func Test_DateOfBirth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			idNum, _ := rsaid.Parse(tt.id)
-			dob := idNum.DateOfBirth
+			dob := idNum.DateOfBirth()
 			if tt.want != dob.String() {
 				t.Errorf("Does not determine date of birth correctly. dob = %v", dob)
 			}
