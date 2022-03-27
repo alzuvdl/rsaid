@@ -20,7 +20,7 @@ func Test_Parse(t *testing.T) {
 		},
 		{
 			name:    "Too Long",
-			id:      "95062451200010",
+			id:      "95062451201802",
 			wantErr: errors.New("the provided south african id number does not equal 13 characters"),
 		},
 		{
@@ -30,7 +30,7 @@ func Test_Parse(t *testing.T) {
 		},
 		{
 			name:    "Invalid Character",
-			id:      "950624G120008",
+			id:      "950624G120081",
 			wantErr: errors.New("the provided south african id number is not numeric"),
 		},
 		{
@@ -40,17 +40,17 @@ func Test_Parse(t *testing.T) {
 		},
 		{
 			name:    "Invalid ID",
-			id:      "9506245120009",
+			id:      "9506245120082",
 			wantErr: errors.New("the provided south african id number is not valid"),
 		},
 		{
 			name:    "Invalid DOB",
-			id:      "9502305120004",
+			id:      "9502305120087",
 			wantErr: errors.New("cannot parse date of birth from id number: parsing time \"1995-02-30\": day out of range"),
 		},
 		{
 			name: "Valid ID",
-			id:   "9506245120008",
+			id:   "9506245120081",
 		},
 	}
 
@@ -73,12 +73,12 @@ func Test_Gender(t *testing.T) {
 	}{
 		{
 			name: "Is Male",
-			id:   "9506245120008",
+			id:   "9506245120081",
 			want: GenderMale,
 		},
 		{
 			name: "Is Female",
-			id:   "9506244120009",
+			id:   "9506244120082",
 			want: GenderFemale,
 		},
 	}
@@ -98,17 +98,22 @@ func Test_Citizen(t *testing.T) {
 	tests := []struct {
 		name string
 		id   string
-		want bool
+		want Citizenship
 	}{
 		{
 			name: "Citizenship",
-			id:   "9506245120008",
-			want: true,
+			id:   "9506245120081",
+			want: CitizenshipCitizen,
 		},
 		{
 			name: "Permanent Resident",
-			id:   "9506245120107",
-			want: false,
+			id:   "9506245120180",
+			want: CitizenshipPermanentResident,
+		},
+		{
+			name: "Unknown Residency",
+			id:   "9901019999283",
+			want: CitizenshipUnknown,
 		},
 	}
 
@@ -134,7 +139,7 @@ func Test_DateOfBirth(t *testing.T) {
 	}{
 		{
 			name: "Between 16 and 100",
-			id:   "9506245120008",
+			id:   "9506245120081",
 			want: "1995-06-24 00:00:00 +0200 SAST",
 		},
 		{

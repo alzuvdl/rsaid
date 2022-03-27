@@ -13,6 +13,7 @@ import (
 var Tick = time.Now
 
 type Gender int
+type Citizenship int
 
 const (
 	GenderUnknown Gender = iota
@@ -20,10 +21,15 @@ const (
 	GenderFemale
 )
 
+const (
+	CitizenshipUnknown Citizenship = iota
+	CitizenshipCitizen
+	CitizenshipPermanentResident
+)
+
 type IdentityNumber struct {
-	raw         string
-	IDNumber    string
-	Citizen     bool
+	Value       string
+	Citizen     Citizenship
 	Gender      Gender
 	DateOfBirth time.Time
 }
@@ -32,7 +38,7 @@ type IdentityNumber struct {
 // Details include the ID number, citizenship, gender and date of birth.
 // It returns the details and any errors encountered.
 func Parse(number string) (IdentityNumber, error) {
-	id := IdentityNumber{raw: number}
+	id := IdentityNumber{Value: number}
 	if err := id.validate(); err != nil {
 		return id, err
 	}
@@ -42,7 +48,7 @@ func Parse(number string) (IdentityNumber, error) {
 		return id, err
 	}
 
-	id.IDNumber = number
+	id.Value = number
 	id.Citizen = id.citizen()
 	id.Gender = id.gender()
 	id.DateOfBirth = dob
@@ -55,15 +61,20 @@ func Parse(number string) (IdentityNumber, error) {
 func (i IdentityNumber) validate() error {
 	var sum int
 	var alternate bool
-	length := len(i.raw)
+	length := len(i.Value)
 	if length != 13 {
 		return errors.New("the provided south african id number does not equal 13 characters")
 	}
 	for j := length - 1; j > -1; j-- {
-		mod, err := strconv.Atoi(string(i.raw[j]))
+		mod, err := strconv.Atoi(string(i.Value[j]))
 		if err != nil {
 			return errors.New("the provided south african id number is not numeric")
 		}
+		// The 12th digit must always be 8
+		if j == 11 && mod != 8 {
+			return errors.New("the provided south african id number has an invalid and decommissioned race digit")
+		}
+
 		if alternate {
 			mod *= 2
 			if mod > 9 {
@@ -84,8 +95,14 @@ func (i IdentityNumber) validate() error {
 // Citizenship is calculated by using the 11th digit of the 13 digit ID number.
 // Zero is considered a citizen, otherwise, it is considered a permanent resident.
 // It returns a boolean value indicating if the person is a citizen or not.
-func (i IdentityNumber) citizen() bool {
-	return i.raw[10:11] == "0"
+func (i IdentityNumber) citizen() Citizenship {
+	cit, _ := strconv.Atoi(i.Value[10:11])
+	if cit == 0 {
+		return CitizenshipCitizen
+	} else if cit == 1 {
+		return CitizenshipPermanentResident
+	}
+	return CitizenshipUnknown
 }
 
 // gender determines if the person is male or female.
@@ -94,7 +111,7 @@ func (i IdentityNumber) citizen() bool {
 // It returns the gender of the person.
 func (i IdentityNumber) gender() Gender {
 	// At this point, we can be assured that digit 7 is numeric
-	gender, _ := strconv.Atoi(i.raw[6:7])
+	gender, _ := strconv.Atoi(i.Value[6:7])
 	if gender < 5 {
 		return GenderFemale
 	} else if gender < 9 {
@@ -103,7 +120,7 @@ func (i IdentityNumber) gender() Gender {
 	return GenderUnknown
 }
 
-// dateofBirth calculates the date of birth of the person.
+// dateOfBirth calculates the date of birth of the person.
 // Date of birth is calculated by using the first 6 digits of the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth and any errors encountered.
@@ -115,15 +132,15 @@ func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 
 	// Get date values based off provided ID number
 	// validate will have ensured we are working with numbers
-	year, _ := strconv.Atoi(i.raw[0:2])
+	year, _ := strconv.Atoi(i.Value[0:2])
 	year = curCentury + year
-	month, _ := strconv.Atoi(i.raw[2:4])
-	day, _ := strconv.Atoi(i.raw[4:6])
+	month, _ := strconv.Atoi(i.Value[2:4])
+	day, _ := strconv.Atoi(i.Value[4:6])
 
 	// Only 16 years and above are eligible for an ID
-	eligibleYear := curYear - 16
+	validYear := curYear - 16
 	// Ensure the ID's DOB is not below 16 years from today, if so it's last century
-	if year > eligibleYear || (year == eligibleYear && (month > int(curMonth) || month == int(curMonth) && day > curDay)) {
+	if year > validYear || (year == validYear && (month > int(curMonth) || month == int(curMonth) && day > curDay)) {
 		year -= 100
 	}
 
