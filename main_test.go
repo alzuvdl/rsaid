@@ -87,7 +87,7 @@ func Test_Gender(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
 			if tt.want != id.Gender {
-				t.Errorf("Does not determine gender correctly")
+				t.Errorf("Does not determine gender correctly. want gender = %v, got gender = %v", tt.want, id.Gender)
 			}
 		})
 	}
@@ -116,7 +116,7 @@ func Test_Citizen(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
 			if tt.want != id.Citizen {
-				t.Errorf("Does not determine citizenship correctly")
+				t.Errorf("Does not determine citizenship correctly. want citizenship = %v, got citizenship = %v", tt.want, id.Citizen)
 			}
 		})
 	}
