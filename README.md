@@ -23,7 +23,7 @@ The first six digits `YYMMDD` indicates a person's birth date. For example, 24 J
 > Although rare, it can happen that someone’s birth date does not correspond with their ID number.
 
 
-The next digit `S` indicates a person's gender or sex. Females have a number of `0 to 4`, while males have `5 to 9`.
+The next digit `S` indicates a person's gender/sex. Females have a number of `0 to 4`, while males have `5 to 9`.
 
 `{950624} {5} NNNCAZ`
 
