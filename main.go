@@ -110,21 +110,21 @@ func (i IdentityNumber) gender() Gender {
 func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 
 	// Get current date along with assumed century
-	currentYear, currentMonth, currentDay := Tick().Date()
-	currentCentury := (currentYear / 100) * 100
+	curYear, curMonth, curDay := Tick().Date()
+	curCentury := (curYear / 100) * 100
 
 	// Get date values based off provided ID number
 	// validate will have ensured we are working with numbers
-	providedYear, _ := strconv.Atoi(i.raw[0:2])
-	providedYear = currentCentury + providedYear
-	providedMonth, _ := strconv.Atoi(i.raw[2:4])
-	providedDay, _ := strconv.Atoi(i.raw[4:6])
+	year, _ := strconv.Atoi(i.raw[0:2])
+	year = curCentury + year
+	month, _ := strconv.Atoi(i.raw[2:4])
+	day, _ := strconv.Atoi(i.raw[4:6])
 
 	// Only 16 years and above are eligible for an ID
-	eligibleYear := currentYear - 16
+	eligibleYear := curYear - 16
 	// Ensure the ID's DOB is not below 16 years from today, if so it's last century
-	if providedYear > eligibleYear || (providedYear == eligibleYear && (providedMonth > int(currentMonth) || providedMonth == int(currentMonth) && providedDay > currentDay)) {
-		providedYear -= 100
+	if year > eligibleYear || (year == eligibleYear && (month > int(curMonth) || month == int(curMonth) && day > curDay)) {
+		year -= 100
 	}
 
 	loc, err := time.LoadLocation("Africa/Johannesburg")
@@ -132,7 +132,7 @@ func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 		return Tick(), errors.New("could not load timezone to parse date of birth")
 	}
 	// Not using time.Date since it will still parse invalid dates. For example, 95/02/30 would parse to 95/03/02.
-	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", providedYear, time.Month(providedMonth), providedDay), loc)
+	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", year, time.Month(month), day), loc)
 	if err != nil {
 		return Tick(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
 	}
