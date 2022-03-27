@@ -25,6 +25,7 @@ const (
 	CitizenshipUnknown Citizenship = iota
 	CitizenshipCitizen
 	CitizenshipPermanentResident
+	CitizenshipRefugee
 )
 
 type IdentityNumber struct {
@@ -96,13 +97,17 @@ func (i IdentityNumber) validate() error {
 // Zero is considered a citizen, otherwise, it is considered a permanent resident.
 // It returns a boolean value indicating if the person is a citizen or not.
 func (i IdentityNumber) citizen() Citizenship {
-	cit, _ := strconv.Atoi(i.Value[10:11])
-	if cit == 0 {
+
+	switch cit, _ := strconv.Atoi(i.Value[10:11]); cit {
+	case 0:
 		return CitizenshipCitizen
-	} else if cit == 1 {
+	case 1:
 		return CitizenshipPermanentResident
+	case 2:
+		return CitizenshipRefugee
+	default:
+		return CitizenshipUnknown
 	}
-	return CitizenshipUnknown
 }
 
 // gender determines if the person is male or female.

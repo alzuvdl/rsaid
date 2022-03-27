@@ -49,6 +49,11 @@ func Test_Parse(t *testing.T) {
 			wantErr: errors.New("cannot parse date of birth from id number: parsing time \"1995-02-30\": day out of range"),
 		},
 		{
+			name:    "Invalid Race",
+			id:      "9506245120001",
+			wantErr: errors.New("the provided south african id number has an invalid and decommissioned race digit"),
+		},
+		{
 			name: "Valid ID",
 			id:   "9506245120081",
 		},
@@ -101,7 +106,7 @@ func Test_Citizen(t *testing.T) {
 		want Citizenship
 	}{
 		{
-			name: "Citizenship",
+			name: "Citizen",
 			id:   "9506245120081",
 			want: CitizenshipCitizen,
 		},
@@ -111,8 +116,13 @@ func Test_Citizen(t *testing.T) {
 			want: CitizenshipPermanentResident,
 		},
 		{
-			name: "Unknown Residency",
+			name: "Refugee",
 			id:   "9901019999283",
+			want: CitizenshipRefugee,
+		},
+		{
+			name: "Unknown Residency",
+			id:   "9901019999382",
 			want: CitizenshipUnknown,
 		},
 	}
