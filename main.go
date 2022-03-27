@@ -95,6 +95,7 @@ func (i IdentityNumber) validate() error {
 // citizenship determines the citizenship status of the person in South Africa.
 // Citizenship is calculated by using the 11th digit of the 13 digit ID number.
 // Zero is considered a citizen, one a permanent resident, two a refugee, otherwise citizenship would be unknown.
+// It returns the citizenship status of the person
 func (i IdentityNumber) citizenship() Citizenship {
 	switch cit, _ := strconv.Atoi(i.Value[10:11]); cit {
 	case 0:
@@ -111,6 +112,7 @@ func (i IdentityNumber) citizenship() Citizenship {
 // gender determines if the person is male or female.
 // Gender is calculated by using the 7th digit of the 13 digit ID number.
 // Zero to four is considered female, five to nine is considered male.
+// It returns the gender of the person
 func (i IdentityNumber) gender() Gender {
 	// At this point, we can be assured that digit 7 is numeric
 	gender, _ := strconv.Atoi(i.Value[6:7])
@@ -125,7 +127,7 @@ func (i IdentityNumber) gender() Gender {
 // dateOfBirth calculates the date of birth of the person.
 // Date of birth is calculated by using the first 6 digits of the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
-// It returns the date of birth and any errors encountered.
+// It returns the date of birth of the person and any errors encountered.
 func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 
 	// Get current date along with assumed century
