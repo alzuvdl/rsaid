@@ -30,7 +30,7 @@ If for example, the number is 120, it means that person was the 120th person to 
 
 `{950624} {5} {120} CAZ`
 
-The next digit `C` indicates the person's citizenship. `0` denoting that the person was born a South African citizen and `1` denoting that the person is a permanent resident.
+The next digit `C` indicates the person's citizenship. `0` denoting that the person was born a South African citizen, `1` denoting that the person is a permanent resident and `2` denoting that the person is a refugee.
 
 `{950624} {5} {120} {0} AZ`
 
@@ -86,7 +86,7 @@ func main() {
 		fmt.Println("Value:", idNum.Value)                                 // Value: 9506245120081
 		fmt.Println("DOB:", idNum.DateOfBirth)                             // DOB: 1995-06-24 00:00:00 +0200 SAST
 		fmt.Println("Male:", idNum.Gender == rsaid.GenderMale)             // Male: true
-		fmt.Println("Citizen:", idNum.Citizen == rsaid.CitizenshipCitizen) // Citizen: true
+		fmt.Println("Citizen:", idNum.Citizenship == rsaid.CitizenshipCitizen) // Citizen: true
 	}
 }
 ```

@@ -130,8 +130,8 @@ func Test_Citizen(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
-			if tt.want != id.Citizen {
-				t.Errorf("Does not determine citizenship correctly. want citizenship = %v, got citizenship = %v", tt.want, id.Citizen)
+			if tt.want != id.Citizenship {
+				t.Errorf("Does not determine citizenship correctly. want citizenship = %v, got citizenship = %v", tt.want, id.Citizenship)
 			}
 		})
 	}

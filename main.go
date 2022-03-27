@@ -30,7 +30,7 @@ const (
 
 type IdentityNumber struct {
 	Value       string
-	Citizen     Citizenship
+	Citizenship Citizenship
 	Gender      Gender
 	DateOfBirth time.Time
 }
@@ -50,7 +50,7 @@ func Parse(number string) (IdentityNumber, error) {
 	}
 
 	id.Value = number
-	id.Citizen = id.citizen()
+	id.Citizenship = id.citizenship()
 	id.Gender = id.gender()
 	id.DateOfBirth = dob
 
@@ -92,11 +92,11 @@ func (i IdentityNumber) validate() error {
 	}
 }
 
-// citizen determines if the person is a South African citizen.
+// citizenship determines if the person is a South African citizen.
 // Citizenship is calculated by using the 11th digit of the 13 digit ID number.
-// Zero is considered a citizen, otherwise, it is considered a permanent resident.
+// Zero is considered a citizen, one a permanent resident, two a refugee, otherwise citizenship would be unknown.
 // It returns a boolean value indicating if the person is a citizen or not.
-func (i IdentityNumber) citizen() Citizenship {
+func (i IdentityNumber) citizenship() Citizenship {
 
 	switch cit, _ := strconv.Atoi(i.Value[10:11]); cit {
 	case 0:
