@@ -14,7 +14,7 @@ The following information can be derived if the ID Number is valid:
 
 A South African ID number is a 13-digit number which is defined by the following format: `YYMMDDSSSSCAZ`.
 
-The first 6 digits `YYMMDD` are based on the person's date of birth. For example, 24 June 1995 is displayed as `950624`
+The first 6 digits `YYMMDD` are based on the person's date of birth. For example, 24 June 1995 is displayed as `950624`.
 
 `{950624} SNNNCAZ`
 
@@ -49,7 +49,7 @@ The next digit `A` was used until the late 1980s to indicate a person’s race. 
 - 6 – Other Asian
 - 7 – Other Coloured
 
-All new ID numbers must have an `A` digit value of `8`
+All new ID numbers must have an `A` digit value of `8`.
 
 `{950624} {5} {120} {0} {8} Z`
 
@@ -57,7 +57,7 @@ The last digit `Z` is a checksum digit, used to check that the number sequence i
 
 `{950624} {5} {120} {0} {8} {1}`
 
-So, ID number `9506245120081` will parse to the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`
+So, ID number `9506245120081` will parse to the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`.
 
 ## Install
 
