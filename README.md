@@ -23,7 +23,7 @@ The first six digits `YYMMDD` indicates a person's birth date. For example, 24 J
 > Although rare, it can happen that someone’s birth date does not correspond with their ID number.
 
 
-The next digit `S` indicates a person's gender/sex. Females have a number of `0 to 4`, while males are `5 to 9`.
+The next digit `S` indicates a person's gender or sex. Females have a number of `0 to 4`, while males have `5 to 9`.
 
 `{950624} {5} NNNCAZ`
 
@@ -45,7 +45,7 @@ The last digit `Z` is a checksum digit, used to check that the number sequence i
 
 `{950624} {5} {120} {0} {0} {8}`
 
-So, ID number `9506245120008` will reflect as the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`
+So, ID number `9506245120008` will parse to the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`
 
 ## Install
 
@@ -66,41 +66,15 @@ import (
 
 func main() {
 
-	id := "9506245120008"
+	person, err := rsaid.Parse("9506245120008")
 
-	if err := rsaid.IsValid(id); err != nil {
-		fmt.Printf("validity error: %s\n", err)
+	if err != nil {
+		fmt.Printf("Invalid South African ID number: %s\n", err)
 	} else {
-		fmt.Printf("%s is a valid South African ID number.\n", id)
+		fmt.Println("ID:", person.IDNumber)                     // ID: 9506245120008
+		fmt.Println("DOB:", person.DateOfBirth)                 // DOB: 1995-06-24 00:00:00 +0200 SAST
+		fmt.Println("Male:", person.Gender == rsaid.GenderMale) // Male: true
+		fmt.Println("Citizen:", person.Citizen)                 // Citizen: true
 	}
-
-	person, err := rsaid.Parse(id)
-	if err != nil {
-		fmt.Printf("parse error: %s\n", err)
-	} else {
-		fmt.Println("Male:", person.Gender == rsaid.GenderMale)     // Male: true
-		fmt.Println("Female:", person.Gender == rsaid.GenderFemale) // Female: false
-		fmt.Println("Citizen:", person.Citizen)                     // Citizen: true
-		fmt.Println("Resident:", !person.Citizen)                   // Resident: false
-		fmt.Println("DOB:", person.DOB)                             // DOB: 1995-06-24 00:00:00 +0200 SAST
-	}
-
-	gender, err := rsaid.Gender(id)
-	if err != nil {
-		fmt.Printf("gender error: %s\n", err)
-	}
-
-	citizen, err := rsaid.IsCitizen(id)
-	if err != nil {
-		fmt.Printf("citizen error: %s\n", err)
-	}
-
-	dob, err := rsaid.DateOfBirth(id)
-	if err != nil {
-		fmt.Printf("date of birth error: %s\n", err)
-	}
-
-	fmt.Printf("Gender: %d, Citizen: %t, DOB: %s\n", gender, citizen, dob)
-	// Gender: 1, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
 }
 ```

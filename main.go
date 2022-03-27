@@ -7,31 +7,60 @@ import (
 	"time"
 )
 
-type gender int
+// Simple library, not heavily focused on time - no need to pull in dependency.
+// Using Tick variable for time.Now, which allows us to mock time.Now() in tests
+// See: https://stackoverflow.com/questions/18970265/is-there-an-easy-way-to-stub-out-time-now-globally-during-test
+var Tick = time.Now
+
+type Gender int
 
 const (
-	GenderUnknown gender = iota
+	GenderUnknown Gender = iota
 	GenderMale
 	GenderFemale
 )
 
-type Details struct {
-	DOB     time.Time
-	Gender  gender
-	Citizen bool
+type IdentityNumber struct {
+	raw         string
+	IDNumber    string
+	Citizen     bool
+	Gender      Gender
+	DateOfBirth time.Time
 }
 
-// IsValid determines if the given ID number is valid using the Luhn algorithm.
-// It returns an error if the ID number is not a valid South African ID nubmer.
-func IsValid(id string) error {
+// Parse parses a South African ID number string into details.
+// Details include the ID number, citizenship, gender and date of birth.
+// It returns the details and any errors encountered.
+func Parse(number string) (IdentityNumber, error) {
+	id := IdentityNumber{raw: number}
+	if err := id.validate(); err != nil {
+		return id, err
+	}
+
+	dob, err := id.dateOfBirth()
+	if err != nil {
+		return id, err
+	}
+
+	id.IDNumber = number
+	id.Citizen = id.citizen()
+	id.Gender = id.gender()
+	id.DateOfBirth = dob
+
+	return id, nil
+}
+
+// validate determines if the given ID number is valid using the Luhn algorithm.
+// It returns an error if the ID number is not a valid, has an invalid length or contains invalid characers.
+func (i IdentityNumber) validate() error {
 	var sum int
 	var alternate bool
-	length := len(id)
+	length := len(i.raw)
 	if length != 13 {
 		return errors.New("the provided south african id number does not equal 13 characters")
 	}
-	for i := length - 1; i > -1; i-- {
-		mod, err := strconv.Atoi(string(id[i]))
+	for j := length - 1; j > -1; j-- {
+		mod, err := strconv.Atoi(string(i.raw[j]))
 		if err != nil {
 			return errors.New("the provided south african id number is not numeric")
 		}
@@ -51,96 +80,62 @@ func IsValid(id string) error {
 	}
 }
 
-// Gender determines if the person is male or female.
-// Gender is calculated by using the 7th digit in the 13 digit ID number.
-// Zero to four is considered female, five to nine is considered male.
-// It returns the gender and any errors encountered.
-func Gender(id string) (gender, error) {
-	if err := IsValid(id); err != nil {
-		return GenderUnknown, err
-	}
-	// At this point, we can be assured that digit 7 is numeric
-	gender, _ := strconv.Atoi(id[6:7])
-	if gender < 5 {
-		return GenderFemale, nil
-	}
-	return GenderMale, nil
-}
-
-// IsCitizen determines if the person is a South African citizen.
-// Citizenship is calculated by using the 11th digit in the 13 digit ID number.
+// citizen determines if the person is a South African citizen.
+// Citizenship is calculated by using the 11th digit of the 13 digit ID number.
 // Zero is considered a citizen, otherwise, it is considered a permanent resident.
-// It returns true if the person is a citizen and any errors encountered.
-func IsCitizen(id string) (bool, error) {
-	if err := IsValid(id); err != nil {
-		return false, err
-	}
-	citizenCode := id[10:11]
-	return citizenCode == "0", nil
+// It returns a boolean value indicating if the person is a citizen or not.
+func (i IdentityNumber) citizen() bool {
+	return i.raw[10:11] == "0"
 }
 
-// DateOfBirth calculates the date of birth of the person.
-// Date of birth is calculated by using the first 6 digits in the 13 digit ID number.
+// gender determines if the person is male or female.
+// Gender is calculated by using the 7th digit of the 13 digit ID number.
+// Zero to four is considered female, five to nine is considered male.
+// It returns the gender of the person.
+func (i IdentityNumber) gender() Gender {
+	// At this point, we can be assured that digit 7 is numeric
+	gender, _ := strconv.Atoi(i.raw[6:7])
+	if gender < 5 {
+		return GenderFemale
+	} else if gender < 9 {
+		return GenderMale
+	}
+	return GenderUnknown
+}
+
+// dateofBirth calculates the date of birth of the person.
+// Date of birth is calculated by using the first 6 digits of the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth and any errors encountered.
-func DateOfBirth(id string) (time.Time, error) {
-	if err := IsValid(id); err != nil {
-		return time.Now(), err
-	}
+func (i IdentityNumber) dateOfBirth() (time.Time, error) {
+
 	// Get current date along with assumed century
-	CurrentYear, CurrentMonth, CurrentDay := time.Now().Date()
-	CurrentCentury := (CurrentYear / 100) * 100
+	currentYear, currentMonth, currentDay := Tick().Date()
+	currentCentury := (currentYear / 100) * 100
 
 	// Get date values based off provided ID number
-	// IsValid will have ensured we are working with numbers
-	ProvidedYear, _ := strconv.Atoi(id[0:2])
-	ProvidedYear = CurrentCentury + ProvidedYear
-	ProvidedMonth, _ := strconv.Atoi(id[2:4])
-	ProvidedDay, _ := strconv.Atoi(id[4:6])
+	// validate will have ensured we are working with numbers
+	providedYear, _ := strconv.Atoi(i.raw[0:2])
+	providedYear = currentCentury + providedYear
+	providedMonth, _ := strconv.Atoi(i.raw[2:4])
+	providedDay, _ := strconv.Atoi(i.raw[4:6])
 
 	// Only 16 years and above are eligible for an ID
-	EligibleYear := CurrentYear - 16
+	eligibleYear := currentYear - 16
 	// Ensure the ID's DOB is not below 16 years from today, if so it's last century
-	if ProvidedYear > EligibleYear || (ProvidedYear == EligibleYear && (ProvidedMonth > int(CurrentMonth) || ProvidedMonth == int(CurrentMonth) && ProvidedDay > CurrentDay)) {
-		ProvidedYear -= 100
+	if providedYear > eligibleYear || (providedYear == eligibleYear && (providedMonth > int(currentMonth) || providedMonth == int(currentMonth) && providedDay > currentDay)) {
+		providedYear -= 100
 	}
 
 	loc, err := time.LoadLocation("Africa/Johannesburg")
 	if err != nil {
-		return time.Now(), errors.New("could not load timezone to parse date of birth")
+		return Tick(), errors.New("could not load timezone to parse date of birth")
 	}
 	// Not using time.Date since it will still parse invalid dates. For example, 95/02/30 would parse to 95/03/02.
-	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", ProvidedYear, time.Month(ProvidedMonth), ProvidedDay), loc)
+	dob, err := time.ParseInLocation("2006-01-02", fmt.Sprintf("%d-%02d-%02d", providedYear, time.Month(providedMonth), providedDay), loc)
 	if err != nil {
-		return time.Now(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
+		return Tick(), fmt.Errorf("cannot parse date of birth from id number: %s", err.Error())
 	}
 
 	return dob, nil
-}
-
-// Parse derives details from a South African ID number.
-// Details include gender, citizenship, and date of birth.
-// It returns the details and any errors encountered.
-func Parse(id string) (Details, error) {
-
-	gender, err := Gender(id)
-	if err != nil {
-		return Details{}, err
-	}
-
-	citizen, err := IsCitizen(id)
-	if err != nil {
-		return Details{}, err
-	}
-
-	dob, err := DateOfBirth(id)
-	if err != nil {
-		return Details{}, err
-	}
-
-	return Details{
-		Gender:  gender,
-		Citizen: citizen,
-		DOB:     dob,
-	}, nil
 }
