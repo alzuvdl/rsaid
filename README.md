@@ -12,7 +12,7 @@ The following information can be derived if the ID Number is valid:
 
 ## Details
 
-A South African ID number is a 13-digit number which is defined by the following format: `YYMMDDSSSSCAZ`.
+A South African ID number is a 13-digit number which is defined by the following format: `YYMMDDSNNNCAZ`.
 
 The first 6 digits `YYMMDD` are based on the person's date of birth. For example, 24 June 1995 is displayed as `950624`.
 
