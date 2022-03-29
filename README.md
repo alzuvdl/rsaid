@@ -36,9 +36,7 @@ The next digit `C` indicates the person's citizenship. `0` denoting that the per
 
 The next digit `A` was used until the late 1980s to indicate a person’s race. This has been eliminated and old ID numbers were reissued to remove this.
 
-> Pre-democracy classifications.
-
-> Before the race group classification was abandoned, this is what digit `A` in the ID number indicated:
+> In pre-democracy classifications (before the race group classification was abandoned) this is what digit `A` in the ID number indicated:
 
 - 0 — White
 - 1 – Cape Coloured
