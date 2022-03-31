@@ -24,7 +24,7 @@ const (
 const (
 	CitizenshipUnknown Citizenship = iota
 	CitizenshipCitizen
-	CitizenshipPermanentResident
+	CitizenshipResident
 	CitizenshipRefugee
 )
 
@@ -101,7 +101,7 @@ func (i IdentityNumber) citizenship() Citizenship {
 	case 0:
 		return CitizenshipCitizen
 	case 1:
-		return CitizenshipPermanentResident
+		return CitizenshipResident
 	case 2:
 		return CitizenshipRefugee
 	default:

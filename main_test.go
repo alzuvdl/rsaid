@@ -113,7 +113,7 @@ func Test_Citizen(t *testing.T) {
 		{
 			name: "Permanent Resident",
 			id:   "9506245120180",
-			want: CitizenshipPermanentResident,
+			want: CitizenshipResident,
 		},
 		{
 			name: "Refugee",
