@@ -142,9 +142,9 @@ func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 	day, _ := strconv.Atoi(i.Value[4:6])
 
 	// Only 16 years and above are eligible for an ID
-	validYear := curYear - 16
+	minYear := curYear - 16
 	// Ensure the ID's DOB is not below 16 years from today, if so it's last century
-	if year > validYear || (year == validYear && (month > int(curMonth) || month == int(curMonth) && day > curDay)) {
+	if year > minYear || (year == minYear && (month > int(curMonth) || month == int(curMonth) && day > curDay)) {
 		year -= 100
 	}
 
