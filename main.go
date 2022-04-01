@@ -13,13 +13,14 @@ import (
 var Tick = time.Now
 
 type Gender int
-type Citizenship int
 
 const (
 	GenderUnknown Gender = iota
 	GenderMale
 	GenderFemale
 )
+
+type Citizenship int
 
 const (
 	CitizenshipUnknown Citizenship = iota
@@ -36,7 +37,7 @@ type IdentityNumber struct {
 }
 
 // Parse derives details from a South African ID number.
-// Details include the ID number, gender, citizenship and date of birth.
+// Details include the number, gender, citizenship and date of birth.
 // It returns the parsed ID number and any errors encountered.
 func Parse(number string) (IdentityNumber, error) {
 	id := IdentityNumber{value: number}
@@ -57,7 +58,7 @@ func Parse(number string) (IdentityNumber, error) {
 	return id, nil
 }
 
-// Value returns the original ID number passed into the parse method.
+// Value returns the raw ID number.
 func (i IdentityNumber) Value() string {
 	return i.value
 }
@@ -111,8 +112,23 @@ func (i IdentityNumber) validate() error {
 	}
 }
 
-// parseCitizenship determines the citizenship status of the person in South Africa.
-// Citizenship is calculated by using the 11th digit of the 13 digit ID number.
+// parseGender determines if the person is male or female.
+// Gender is calculated using the 7th digit of the 13 digit ID number.
+// Zero to four is considered female, five to nine is considered male.
+// It returns the gender of the person.
+func (i IdentityNumber) parseGender() Gender {
+	// validate will have ensured that digit 7 is numeric
+	gender, _ := strconv.Atoi(i.value[6:7])
+	if gender <= 4 {
+		return GenderFemale
+	} else if gender <= 9 {
+		return GenderMale
+	}
+	return GenderUnknown
+}
+
+// parseCitizenship determines the citizenship status of the person.
+// Citizenship is calculated using the 11th digit of the 13 digit ID number.
 // Zero is considered a citizen, one a permanent resident, two a refugee, otherwise citizenship would be unknown.
 // It returns the citizenship status of the person.
 func (i IdentityNumber) parseCitizenship() Citizenship {
@@ -129,23 +145,8 @@ func (i IdentityNumber) parseCitizenship() Citizenship {
 	}
 }
 
-// parseGender determines if the person is male or female.
-// Gender is calculated by using the 7th digit of the 13 digit ID number.
-// Zero to four is considered female, five to nine is considered male.
-// It returns the gender of the person.
-func (i IdentityNumber) parseGender() Gender {
-	// validate will have ensured that digit 7 is numeric
-	gender, _ := strconv.Atoi(i.value[6:7])
-	if gender <= 4 {
-		return GenderFemale
-	} else if gender <= 9 {
-		return GenderMale
-	}
-	return GenderUnknown
-}
-
 // parseDateOfBirth calculates the date of birth of the person.
-// Date of birth is calculated by using the first 6 digits of the 13 digit ID number.
+// Date of birth is calculated using the first 6 digits of the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth of the person and any errors encountered.
 func (i IdentityNumber) parseDateOfBirth() (time.Time, error) {
