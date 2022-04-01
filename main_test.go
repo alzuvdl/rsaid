@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Test_Parse(t *testing.T) {
+func TestParse(t *testing.T) {
 
 	tests := []struct {
 		name    string
@@ -91,8 +91,9 @@ func Test_Gender(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
-			if tt.want != id.Gender {
-				t.Errorf("Does not determine gender correctly. want gender = %v, got gender = %v", tt.want, id.Gender)
+			gen := id.Gender()
+			if tt.want != gen {
+				t.Errorf("Does not determine gender correctly. want gender = %v, got gender = %v", tt.want, gen)
 			}
 		})
 	}
@@ -130,8 +131,9 @@ func Test_Citizen(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
-			if tt.want != id.Citizenship {
-				t.Errorf("Does not determine citizenship correctly. want citizenship = %v, got citizenship = %v", tt.want, id.Citizenship)
+			cit := id.Citizenship()
+			if tt.want != cit {
+				t.Errorf("Does not determine citizenship correctly. want citizenship = %v, got citizenship = %v", tt.want, cit)
 			}
 		})
 	}
@@ -162,7 +164,7 @@ func Test_DateOfBirth(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			id, _ := Parse(tt.id)
-			dob := id.DateOfBirth
+			dob := id.DateOfBirth()
 			if tt.want != dob.String() {
 				t.Errorf("Does not determine date of birth correctly. want dob = %v, got dob = %v", tt.want, dob)
 			}

@@ -81,10 +81,10 @@ func main() {
 	if err != nil {
 		fmt.Printf("Invalid South African ID number: %s\n", err)
 	} else {
-		fmt.Println("Value:", idNum.Value)                                     // Value: 9506245120081
-		fmt.Println("DOB:", idNum.DateOfBirth)                                 // DOB: 1995-06-24 00:00:00 +0200 SAST
-		fmt.Println("Male:", idNum.Gender == rsaid.GenderMale)                 // Male: true
-		fmt.Println("Citizen:", idNum.Citizenship == rsaid.CitizenshipCitizen) // Citizen: true
+		fmt.Println("Value:", idNum.Value())                                     // Value: 9506245120081
+		fmt.Println("DOB:", idNum.DateOfBirth())                                 // DOB: 1995-06-24 00:00:00 +0200 SAST
+		fmt.Println("Male:", idNum.Gender() == rsaid.GenderMale)                 // Male: true
+		fmt.Println("Citizen:", idNum.Citizenship() == rsaid.CitizenshipCitizen) // Citizen: true
 	}
 }
 ```

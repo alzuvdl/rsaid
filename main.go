@@ -29,32 +29,52 @@ const (
 )
 
 type IdentityNumber struct {
-	Value       string
-	Citizenship Citizenship
-	Gender      Gender
-	DateOfBirth time.Time
+	value       string
+	gender      Gender
+	citizenship Citizenship
+	dateOfBirth time.Time
 }
 
-// Parse parses a South African ID number string into details.
-// Details include the ID number, citizenship, gender and date of birth.
-// It returns the details and any errors encountered.
+// Parse derives details from a South African ID number.
+// Details include the ID number, gender, citizenship and date of birth.
+// It returns the parsed ID number and any errors encountered.
 func Parse(number string) (IdentityNumber, error) {
-	id := IdentityNumber{Value: number}
+	id := IdentityNumber{value: number}
 	if err := id.validate(); err != nil {
 		return id, err
 	}
 
-	dob, err := id.dateOfBirth()
+	dob, err := id.parseDateOfBirth()
 	if err != nil {
 		return id, err
 	}
 
-	id.Value = number
-	id.Citizenship = id.citizenship()
-	id.Gender = id.gender()
-	id.DateOfBirth = dob
+	id.value = number
+	id.gender = id.parseGender()
+	id.citizenship = id.parseCitizenship()
+	id.dateOfBirth = dob
 
 	return id, nil
+}
+
+// Value returns the original ID number passed into the parse method.
+func (i IdentityNumber) Value() string {
+	return i.value
+}
+
+// Gender returns the gender of the parsed ID number.
+func (i IdentityNumber) Gender() Gender {
+	return i.gender
+}
+
+// DateOfBirth returns the date of birth of the parsed ID number.
+func (i IdentityNumber) DateOfBirth() time.Time {
+	return i.dateOfBirth
+}
+
+// Citizenship returns the citizenship status of the parsed ID number.
+func (i IdentityNumber) Citizenship() Citizenship {
+	return i.citizenship
 }
 
 // validate determines if the given ID number is valid using the Luhn algorithm.
@@ -62,12 +82,12 @@ func Parse(number string) (IdentityNumber, error) {
 func (i IdentityNumber) validate() error {
 	var sum int
 	var alternate bool
-	length := len(i.Value)
+	length := len(i.value)
 	if length != 13 {
 		return errors.New("the provided south african id number does not equal 13 characters")
 	}
 	for j := length - 1; j > -1; j-- {
-		mod, err := strconv.Atoi(string(i.Value[j]))
+		mod, err := strconv.Atoi(string(i.value[j]))
 		if err != nil {
 			return errors.New("the provided south african id number is not numeric")
 		}
@@ -75,7 +95,6 @@ func (i IdentityNumber) validate() error {
 		if j == 11 && mod != 8 {
 			return errors.New("the provided south african id number has an invalid and decommissioned race digit")
 		}
-
 		if alternate {
 			mod *= 2
 			if mod > 9 {
@@ -92,12 +111,13 @@ func (i IdentityNumber) validate() error {
 	}
 }
 
-// citizenship determines the citizenship status of the person in South Africa.
+// parseCitizenship determines the citizenship status of the person in South Africa.
 // Citizenship is calculated by using the 11th digit of the 13 digit ID number.
 // Zero is considered a citizen, one a permanent resident, two a refugee, otherwise citizenship would be unknown.
-// It returns the citizenship status of the person
-func (i IdentityNumber) citizenship() Citizenship {
-	switch cit, _ := strconv.Atoi(i.Value[10:11]); cit {
+// It returns the citizenship status of the person.
+func (i IdentityNumber) parseCitizenship() Citizenship {
+	// validate will have ensured that digit 11 is numeric
+	switch cit, _ := strconv.Atoi(i.value[10:11]); cit {
 	case 0:
 		return CitizenshipCitizen
 	case 1:
@@ -109,26 +129,26 @@ func (i IdentityNumber) citizenship() Citizenship {
 	}
 }
 
-// gender determines if the person is male or female.
+// parseGender determines if the person is male or female.
 // Gender is calculated by using the 7th digit of the 13 digit ID number.
 // Zero to four is considered female, five to nine is considered male.
-// It returns the gender of the person
-func (i IdentityNumber) gender() Gender {
-	// At this point, we can be assured that digit 7 is numeric
-	gender, _ := strconv.Atoi(i.Value[6:7])
-	if gender < 5 {
+// It returns the gender of the person.
+func (i IdentityNumber) parseGender() Gender {
+	// validate will have ensured that digit 7 is numeric
+	gender, _ := strconv.Atoi(i.value[6:7])
+	if gender <= 4 {
 		return GenderFemale
-	} else if gender < 9 {
+	} else if gender <= 9 {
 		return GenderMale
 	}
 	return GenderUnknown
 }
 
-// dateOfBirth calculates the date of birth of the person.
+// parseDateOfBirth calculates the date of birth of the person.
 // Date of birth is calculated by using the first 6 digits of the 13 digit ID number.
 // The first pair of digits are the year, the second pair is the month and the third pair is the day.
 // It returns the date of birth of the person and any errors encountered.
-func (i IdentityNumber) dateOfBirth() (time.Time, error) {
+func (i IdentityNumber) parseDateOfBirth() (time.Time, error) {
 
 	// Get current date along with assumed century
 	curYear, curMonth, curDay := Tick().Date()
@@ -136,10 +156,10 @@ func (i IdentityNumber) dateOfBirth() (time.Time, error) {
 
 	// Get date values based off provided ID number
 	// validate will have ensured we are working with numbers
-	year, _ := strconv.Atoi(i.Value[0:2])
+	year, _ := strconv.Atoi(i.value[0:2])
 	year = curCentury + year
-	month, _ := strconv.Atoi(i.Value[2:4])
-	day, _ := strconv.Atoi(i.Value[4:6])
+	month, _ := strconv.Atoi(i.value[2:4])
+	day, _ := strconv.Atoi(i.value[4:6])
 
 	// Only 16 years and above are eligible for an ID
 	minYear := curYear - 16
