@@ -1,8 +1,8 @@
 # 🇿🇦 South African ID Validator for Go
 
-> Inspired by https://www.npmjs.com/package/south-african-id-validator
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=flat-square)](https://pkg.go.dev/mod/github.com/jacovdloo/rsaid)
 
-Validate South African ID numbers. Takes eligibility age into account (16 years).
+Validate ID numbers for the Republic of South Africa - taking eligibility age (16 years) into account.
 
 The following information can be derived if the ID Number is valid:
 
@@ -12,39 +12,50 @@ The following information can be derived if the ID Number is valid:
 
 ## Details
 
-A South African ID number is a 13-digit number with the following format: `YYMMDDSNNNCAZ`.
+A South African ID number is a 13-digit number which is defined by the following format: `YYMMDDSNNNCAZ`.
 
-The first six digits `YYMMDD` indicates a person's birth date. For example, 24 June 1995 becomes **950624**. Yes, RWC winners! 🏉
+The first 6 digits `YYMMDD` are based on the person's date of birth. For example, 24 June 1995 is displayed as `950624`.
 
-Although rare, it can happen that someone’s birth date does not correspond with their ID number.
+`{950624} SNNNCAZ`
 
-> {950624} SNNNCAZ.
+> Although rare, it can happen that someone’s birth date does not correspond with their ID number.
 
+The next digit `S` is used to define the person's gender. Females are assigned numbers in the range `0-4` and males from `5-9`.
 
-The next digit `S` indicates a person's gender. Females have a number of `0 to 4`, while males are `5 to 9`.
+`{950624} {5} NNNCAZ`
 
-> {950624} {5} NNNCAZ
-
-The next three digits `NNN` indicates the position of birth by registry based on the date of birth and gender.
+The next three digits `NNN` indicates the person's position of birth in the registry based on the date of birth and gender.
 
 If for example, the number is 120, it means that person was the 120th person to be registered as having been born on that particular day, for that gender.
 
-> TODO/Find out: Males start at 5 so is {5}{120} = 120, but {6}{150} would be 1000 (000 - 999) + 150 = 1150th birth/registration for that day or just 150? That would mean there is a limit of 1000 male/female registrations per day?
+`{950624} {5} {120} CAZ`
 
-> {950624} {5} {120} CAZ
+The next digit `C` indicates the person's citizenship. `0` denoting that the person was born a South African citizen, `1` denoting that the person is a permanent resident and `2` denoting that the person is a refugee.
 
-The next digit `C` indicates citizenship. `0` if the person is a South African citizen, or `1` if the person is a permanent resident.
+`{950624} {5} {120} {0} AZ`
 
-> {950624} {5} {120} {0} AZ
+The next digit `A` was used until the late 1980s to indicate a person’s race. This has been eliminated and old ID numbers were reissued to remove this.
 
-The next digit `A` was used until the late 1980s to indicate a person’s race. This has been eliminated and
-old ID numbers were reissued to remove this.
+> In pre-democracy classifications (before the race group classification was abandoned) digit `A` indicated the following:
 
-> {950624} {5} {120} {0} {0} Z
+- 0 — White
+- 1 – Cape Coloured
+- 2 – Malay
+- 3 – Griqua
+- 4 – Chinese
+- 5 – Indian
+- 6 – Other Asian
+- 7 – Other Coloured
 
-The last digit `Z` is a checksum digit, used to check that the number sequence is accurate using the Luhn algorithm.
+All new ID numbers must have an `A` digit value of `8`.
 
-So, ID number `9506245120008` will reflect as the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`
+`{950624} {5} {120} {0} {8} Z`
+
+The last digit `Z` is a checksum digit, used to check that the number sequence is accurate using the [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm.
+
+`{950624} {5} {120} {0} {8} {1}`
+
+So, ID number `9506245120081` will parse to the `120th` `male` South African `citizen` born/registered on the `24th of June, 1995`.
 
 ## Install
 
@@ -65,32 +76,15 @@ import (
 
 func main() {
 
-  id := "9506245120008"
-  person, err := rsaid.Parse(id)
-  if err != nil {
-    fmt.Println(err)
-  } else {
-    fmt.Println("Gender:", person.Gender) // Gender: male
-    fmt.Println("Citizen:", person.Citizen) // Citizen: true
-    fmt.Println("DOB:", person.DOB) //DOB: 1995-06-24 00:00:00 +0200 SAST
-  }
+	idNum, err := rsaid.Parse("9506245120081")
 
-  gender, g_err := rsaid.Gender(id)
-  if g_err != nil {
-    fmt.Println(g_err)
-  }
-
-  citizen, c_err := rsaid.IsCitizen(id)
-  if c_err != nil {
-    fmt.Println(c_err)
-  }
-
-  dob, d_err := rsaid.BirthDate(id)
-  if d_err != nil {
-    fmt.Println(d_err)
-  }
-
-  fmt.Printf("Gender: %s, Citizen: %t, DOB: %s\n", gender, citizen, dob)
-  // Gender: male, Citizen: true, DOB: 1995-06-24 00:00:00 +0200 SAST
+	if err != nil {
+		fmt.Printf("Invalid South African ID number: %s\n", err)
+	} else {
+		fmt.Println("Value:", idNum.Value())                                     // Value: 9506245120081
+		fmt.Println("DOB:", idNum.DateOfBirth())                                 // DOB: 1995-06-24 00:00:00 +0200 SAST
+		fmt.Println("Male:", idNum.Gender() == rsaid.GenderMale)                 // Male: true
+		fmt.Println("Citizen:", idNum.Citizenship() == rsaid.CitizenshipCitizen) // Citizen: true
+	}
 }
 ```
