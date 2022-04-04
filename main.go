@@ -30,10 +30,10 @@ const (
 )
 
 type IdentityNumber struct {
-	value       string
+	dateOfBirth time.Time
 	gender      Gender
 	citizenship Citizenship
-	dateOfBirth time.Time
+	value       string
 }
 
 // Parse derives details from a South African ID number.
@@ -50,10 +50,10 @@ func Parse(number string) (IdentityNumber, error) {
 		return id, err
 	}
 
-	id.value = number
+	id.dateOfBirth = dob
 	id.gender = id.parseGender()
 	id.citizenship = id.parseCitizenship()
-	id.dateOfBirth = dob
+	id.value = number
 
 	return id, nil
 }
@@ -133,7 +133,8 @@ func (i IdentityNumber) parseGender() Gender {
 // It returns the citizenship status of the person.
 func (i IdentityNumber) parseCitizenship() Citizenship {
 	// validate will have ensured that digit 11 is numeric
-	switch cit, _ := strconv.Atoi(i.value[10:11]); cit {
+	cit, _ := strconv.Atoi(i.value[10:11])
+	switch cit {
 	case 0:
 		return CitizenshipCitizen
 	case 1:

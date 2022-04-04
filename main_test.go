@@ -46,7 +46,7 @@ func TestParse(t *testing.T) {
 		{
 			name:    "Invalid DOB",
 			id:      "9502305120087",
-			wantErr: errors.New("cannot parse date of birth from id number: parsing time \"1995-02-30\": day out of range"),
+			wantErr: errors.New(`cannot parse date of birth from id number: parsing time "1995-02-30": day out of range`),
 		},
 		{
 			name:    "Invalid Race",
